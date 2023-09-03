@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define INITIAL_CAPACITY 10
+
+struct DynamicArrayStack {
+    int *array;
+    int top;
+    int capacity;
+};
+
+// Initialize an empty dynamic array-based stack
+struct DynamicArrayStack* initialize() {
+    struct DynamicArrayStack *stack = (struct DynamicArrayStack*)malloc(sizeof(struct DynamicArrayStack));
+    if (stack == NULL) {
+        printf("Memory allocation error\n");
+        exit(1);
+    }
+
+    stack->array = (int*)malloc(INITIAL_CAPACITY * sizeof(int));
+    if (stack->array == NULL) {
+        printf("Memory allocation error\n");
+        exit(1);
+    }
+
+    stack->top = -1;
+    stack->capacity = INITIAL_CAPACITY;
+
+    return stack;
+}
+
+// Check if the stack is empty
+int isEmpty(struct DynamicArrayStack *stack) {
+    return stack->top == -1;
+}
+
+// Check if the stack is full
+int isFull(struct DynamicArrayStack *stack) {
+    return stack->top == stack->capacity - 1;
+}
+
+// Push an element onto the stack
+void push(struct DynamicArrayStack *stack, int value) {
+    if (isFull(stack)) {
+        // If the stack is full, double the capacity
+        stack->capacity *= 2;
+        stack->array = (int*)realloc(stack->array, stack->capacity * sizeof(int));
+        if (stack->array == NULL) {
+            printf("Memory allocation error\n");
+            exit(1);
+        }
+    }
+
+    stack->array[++stack->top] = value;
+}
+
+// Pop an element from the stack
+int pop(struct DynamicArrayStack *stack) {
+    if (isEmpty(stack)) {
+        printf("Stack underflow\n");
+        exit(1);
+    }
+
+    return stack->array[stack->top--];
+}
+
+// Peek at the top element without removing it
+int peek(struct DynamicArrayStack *stack) {
+    if (isEmpty(stack)) {
+        printf("Stack is empty\n");
+        exit(1);
+    }
+
+    return stack->array[stack->top];
+}
+
+// Free the memory used by the dynamic array-based stack
+void destroy(struct DynamicArrayStack *stack) {
+    free(stack->array);
+    free(stack);
+}
+
+int main() {
+    struct DynamicArrayStack *stack = initialize();
+
+    push(stack, 10);
+    push(stack, 20);
+    push(stack, 30);
+
+    printf("Top element: %d\n", peek(stack));
+
+    while (!isEmpty(stack)) {
+        printf("Popped: %d\n", pop(stack));
+    }
+
+    // Clean up
+    destroy(stack);
+
+    return 0;
+}
